@@ -14,7 +14,8 @@ const port = process.env.PORT;
 
 
 app.use(cors({
-    origin: true
+    origin: true,
+    credentials: true
 }));
 app.use(bodyParser.json());
 app.use(
