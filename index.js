@@ -39,7 +39,7 @@ app.use(
             dbName: "BB",
             collectionName: "sesh",
         }),
-        cookie: { sameSite: 'none' }
+        cookie: { sameSite: 'none', secure: true }
     })
 );
 
