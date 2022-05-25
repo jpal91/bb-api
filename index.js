@@ -14,7 +14,7 @@ const port = process.env.PORT;
 
 
 app.use(cors({
-    origin: true,
+    origin: 'https://628e32c2f5095515aef829dd--jazzy-twilight-7301d9.netlify.app',
     credentials: true,
 
 }));
@@ -25,7 +25,10 @@ app.use(
     })
 );
 
-
+app.all('*', (req, res, next) => {
+    console.log(req)
+    next()
+})
 
 app.use(morgan('combined'))
 
