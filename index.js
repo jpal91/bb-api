@@ -15,7 +15,8 @@ const port = process.env.PORT;
 
 app.use(cors({
     origin: true,
-    credentials: true
+    credentials: true,
+
 }));
 app.use(bodyParser.json());
 app.use(
@@ -27,6 +28,8 @@ app.use(
 
 
 app.use(morgan('combined'))
+
+app.set('trust-proxy', 1)
 
 app.use(
     session({
