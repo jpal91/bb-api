@@ -85,7 +85,7 @@ auth.post(
 );
 
 //logout function
-auth.get('/api/logout', (req, res) => {
+auth.post('/api/logout', (req, res) => {
     req.logout()
     req.session.destroy()
     res.set({'Access-Control-Allow-Credentials': true})
