@@ -25,10 +25,6 @@ app.use(
     })
 );
 
-app.all('*', (req, res, next) => {
-    console.log(req)
-    next()
-})
 
 app.use(morgan('combined'))
 
@@ -45,7 +41,7 @@ app.use(
             dbName: "BB",
             collectionName: "sesh",
         }),
-        cookie: { sameSite: 'none', secure: true }
+        cookie: {  }
     })
 );
 
