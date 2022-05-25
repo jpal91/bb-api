@@ -19,7 +19,8 @@ const col = db.collection("users");
 // client.on('commandFailed', (event) => console.debug(event));
 
 
-
+//uses passport local strategy to compare username and password provided
+//with one in DB. If correct, will add session into DB store
 passport.use(
     new LocalStrategy((username, password, done) => {
         const local = async () => {
@@ -54,35 +55,13 @@ passport.use(
     })
 );
 
-
+//gets user session upon action to api
 passport.serializeUser((user, done) => {
-    console.log(user)
+
     done(null, { id: user._id, expires: user.auth.expires_in });
 });
 
-// passport.deserializeUser((id, done) => {
-//     console.log('Here2')
-//     const deSer = async () => {
-//         try {
-//             await client.connect();
-//             console.log('Here')
-//             await col.findOne({ _id: id }).then(async (response) => {
-//                 await client.close()
-//                 done(null, response)
-//             });
-
-//             //done(null, response);
-//         } catch (e) {
-//             console.log(e);
-//             done(e);
-//         } finally {
-//             await client.close();
-            
-//         }
-//     }
-//     deSer()
-// });
-
+//gets subsequent pulls of session (I think)
 passport.deserializeUser(function(user, cb) {
     //console.log(user)
     process.nextTick(function() {
@@ -90,51 +69,37 @@ passport.deserializeUser(function(user, cb) {
     });
   });
 
-// auth.post('/api/login', async (req, res) => {
-//     const { username, password } = req.body
 
-//     try {
-//         await client.connect()
-
-//         const response = await col.findOne(
-//             { email: username }
-//         )
-
-//         if (!response) {
-//             return res.send('User not found')
-//         }
-
-//         const isValid = await bcrypt.compare(password, response.password)
-
-//         if (!isValid) {
-//             return res.send('Password incorrect')
-//         }
-//         req.session.save()
-//         console.log(req.session)
-//         res.send('Accepted')
-//     } catch(e) {
-//         console.log(e)
-//     } finally {
-//         await client.close()
-//     }
-// })
-
+//login function, returns the user's id and the expiration of their
+//auth token that's used to pull from the bombbomb api
 auth.post(
     "/api/login",
     passport.authenticate("local", {
         failureRedirect: "/login",
     }),
     (req, res) => {
-
+        
         const { _id, auth } = req.user;
         res.status(200).send({ id: _id, expires: auth.expires_in });
     }
 );
 
+//logout function
+auth.get('/api/logout', (req, res) => {
+    req.logout()
+    req.session.destroy()
+    res.set({'Access-Control-Allow-Credentials': true})
+    res.send('Done')
+})
+
+//returns the general signup link
+//provides the link to bombbomb with dev OAUTH and returns code to browser
 auth.get('/api/signup-link', (req, res) => {
     res.send(`https://app.bombbomb.com/auth/authorize?client_id=${process.env.AUTH0_CLIENT_ID}&scope=all:manage&redirect_uri=http://localhost:3000/getAuth&response_type=code`)
 })
 
+//after code is retruned to browser, user signs up with email/password
+//code is authenticated with bb and auth token/refresh token is returned
 auth.post('/api/sign-up', async (req, res) => {
     const { email, password, code } = req.body
 
@@ -184,56 +149,21 @@ auth.post('/api/sign-up', async (req, res) => {
     }
 })
 
-// auth.post('/api/attach-auth', async (req, res) => {
-//     const { auth, email } = req.body
-
-//     try {
-//         await client.connect()
-        
-//         const response = await axios.post('https://app.bombbomb.com/auth/access_token', {
-//             grant_type: 'authorization_code',
-//             client_id: process.env.AUTH0_CLIENT_ID,
-//             client_secret: process.env.AUTH0_CLIENT_SECRET,
-//             redirect_uri: 'http://localhost:3000/getAuth',
-//             code: auth
-//         })
-
-//         let now = new Date()
-//         let newExpire = new Date(now.valueOf() + (response.data.expires_in * 1000))
-//         response.data.expires_in = newExpire.toISOString()
-
-//         console.log(response.data)
-
-//         const result = await col.updateOne(
-//             { email: email },
-//             { $set: { auth: response.data } }
-//         )
-
-//         console.log(result)
-
-//         res.send('Accepted')
-//     } catch(e) {
-//         console.log(e)
-//     } finally {
-//         await client.close()
-//     }
-// })
-
+//periodic check of authorization, pulls user session data
 auth.get("/api/check-auth", (req, res) => {
-    //console.log(req.user)
+
     if (!req.user) {
+        //allows the app to send "with credentials" to confirm session data from cookie
         res.set({'Access-Control-Allow-Credentials': true})
         res.send("Dunno man");
     } else {
-        if (new Date() > new Date(req.user.expires)) {
-            // console.log('Needs refresh')
-            // console.log(req.user)
-        }
         res.set({'Access-Control-Allow-Credentials': true})
         res.send(req.user);
     }
 });
 
+//if auth token expires (1 hour) new auth token is requested
+//takes the refresh token and returns new auth data, adds to db
 auth.get('/api/refresh-auth', async (req, res) => {
     const { id } = req.user
     

@@ -1,3 +1,5 @@
 .env
 pnpm-lock.yaml
 node_modules
+deprecated
+notes.txt

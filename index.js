@@ -1,14 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
-const router = express.Router()
 const cors = require("cors");
 require("dotenv").config();
 const passport = require('passport')
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const morgan = require('morgan');
-const { createProxyMiddleware } = require("http-proxy-middleware");
+
 
 
 const port = process.env.PORT;

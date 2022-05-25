@@ -15,6 +15,7 @@ const api = axios.create({
     
 })
 
+//gets user data from bb
 ui.post('/api/app/user', async (req, res) => {
     const { id } = req.body
 
@@ -38,6 +39,7 @@ ui.post('/api/app/user', async (req, res) => {
     }
 })
 
+//gets all user videos
 ui.post('/api/app/videos', async (req, res) => {
     const { id } = req.body
 
@@ -61,8 +63,10 @@ ui.post('/api/app/videos', async (req, res) => {
     }
 })
 
+//sends a quickshare video for each email sent from app
+//includes a message, subject line, email addresses, and options for cc'ing on email
 ui.post('/api/app/send-vid', async (req, res) => {
-    const { id, emails, copy, userEmail, userId } = req.body
+    const { id, emails, copy, userEmail, userId, subject, message } = req.body
     console.log(req.body)
     let emailList = Object.values(emails)
     try {
@@ -76,9 +80,9 @@ ui.post('/api/app/send-vid', async (req, res) => {
         for (let i = 0; i < emailList.length; i++) {
             let obj = {
                 videoId: id,
-                emailAddresses: copy ? `${emailList[i]},${userEmail}` : emailList[i],
-                subject: 'Fast 15',
-                Message: 'Hello! This is a test',
+                emailAddresses: copy ? `${emailList[i]};${userEmail}` : emailList[i],
+                subject: subject,
+                message: message,
                 extendedProperties: 'true'
             }
 
@@ -97,5 +101,6 @@ ui.post('/api/app/send-vid', async (req, res) => {
         await client.close()
     }
 })
+
 
 module.exports = ui
