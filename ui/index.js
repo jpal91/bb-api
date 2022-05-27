@@ -66,9 +66,9 @@ ui.post('/api/app/videos', async (req, res) => {
 //sends a quickshare video for each email sent from app
 //includes a message, subject line, email addresses, and options for cc'ing on email
 ui.post('/api/app/send-vid', async (req, res) => {
-    const { id, emails, copy, userEmail, userId, subject, message } = req.body
+    const { id, emailObj, copy, userEmail, userId, subject, message } = req.body
     console.log(req.body)
-    let emailList = Object.values(emails)
+    let emailList = Object.values(emailObj)
     try {
         await client.connect()
 
@@ -86,12 +86,12 @@ ui.post('/api/app/send-vid', async (req, res) => {
                 extendedProperties: 'true'
             }
 
-            const response = await api.post('/emails/quicksend',
-                { ...obj },
-                {headers: { 'Authorization' : `Bearer ${result.auth.access_token}` }}
-            )
+            // const response = await api.post('/emails/quicksend',
+            //     { ...obj },
+            //     {headers: { 'Authorization' : `Bearer ${result.auth.access_token}` }}
+            // )
 
-            console.log(response.data)
+            console.log(obj)
         }
 
         res.send('Done')
