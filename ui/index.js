@@ -86,12 +86,12 @@ ui.post('/api/app/send-vid', async (req, res) => {
                 extendedProperties: 'true'
             }
 
-            // const response = await api.post('/emails/quicksend',
-            //     { ...obj },
-            //     {headers: { 'Authorization' : `Bearer ${result.auth.access_token}` }}
-            // )
+            const response = await api.post('/emails/quicksend',
+                { ...obj },
+                {headers: { 'Authorization' : `Bearer ${result.auth.access_token}` }}
+            )
 
-            console.log(obj)
+            console.log(response.data)
         }
 
         res.send('Done')
