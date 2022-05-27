@@ -67,7 +67,7 @@ ui.post('/api/app/videos', async (req, res) => {
 //includes a message, subject line, email addresses, and options for cc'ing on email
 ui.post('/api/app/send-vid', async (req, res) => {
     const { id, emailObj, copy, userEmail, userId, subject, message } = req.body
-    console.log(req.body)
+
     let emailList = Object.values(emailObj)
     try {
         await client.connect()
@@ -92,6 +92,7 @@ ui.post('/api/app/send-vid', async (req, res) => {
             )
 
             console.log(response.data)
+            // console.log(obj)
         }
 
         res.send('Done')
